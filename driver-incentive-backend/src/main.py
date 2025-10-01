@@ -21,9 +21,20 @@ app.register_blueprint(user_bp, url_prefix='/api')
 app.register_blueprint(driver_bp, url_prefix='/api')
 app.register_blueprint(admin_bp, url_prefix='/api')
 
-# uncomment if you need to use database
-app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{os.path.join(os.path.dirname(__file__), 'database', 'app.db')}"
+# Database configuration: prefer DATABASE_URL env (Railway provides it), fallback to local sqlite
+# Supports sqlite path and common postgres URLs
+DATABASE_URL = os.getenv('DATABASE_URL') or os.getenv('DB_URL')
+if DATABASE_URL:
+    if DATABASE_URL.startswith('postgres://'):
+        DATABASE_URL = DATABASE_URL.replace('postgres://', 'postgresql://', 1)
+    app.config['SQLALCHEMY_DATABASE_URI'] = DATABASE_URL
+else:
+    sqlite_path = os.path.join(os.path.dirname(__file__), 'database', 'app.db')
+    app.config['SQLALCHEMY_DATABASE_URI'] = f"sqlite:///{sqlite_path}"
+
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Initialize DB
 db.init_app(app)
 with app.app_context():
     db.create_all()
@@ -46,4 +57,6 @@ def serve(path):
 
 
 if __name__ == '__main__':
-    app.run(host='0.0.0.0', port=5000, debug=True)
+    port = int(os.getenv('PORT', '5000'))
+    debug = os.getenv('FLASK_DEBUG', '0') == '1'
+    app.run(host='0.0.0.0', port=port, debug=debug)

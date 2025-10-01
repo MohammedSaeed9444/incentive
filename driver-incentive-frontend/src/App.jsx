@@ -8,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs.j
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table.jsx'
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert.jsx'
 import './App.css'
+import { fetchJson } from '@/lib/utils.js'
 
 function App() {
   const [searchId, setSearchId] = useState('')
@@ -37,13 +38,11 @@ function App() {
   const loginAdmin = async () => {
     setAuthError('')
     try {
-      const res = await fetch('/api/admin/login', {
+      const data = await fetchJson('/api/admin/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ username: adminUsername, password: adminPassword })
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Login failed')
       setAdminToken(data.token)
       localStorage.setItem('admin_token', data.token)
       setAdminPassword('')
@@ -66,15 +65,13 @@ function App() {
     try {
       const formData = new FormData()
       formData.append('file', file)
-      const res = await fetch('/api/admin/upload', {
+      const data = await fetchJson('/api/admin/upload', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${adminToken}`
         },
         body: formData
       })
-      const data = await res.json()
-      if (!res.ok) throw new Error(data.error || 'Upload failed')
       setUploadSummary(data.summary)
       setUploadErrors(data.errors || [])
     } catch (e) {
@@ -98,12 +95,7 @@ function App() {
     
     try {
       // Search for driver
-      const searchResponse = await fetch(`/api/drivers/search?driver_id=${encodeURIComponent(searchId)}`)
-      const searchData = await searchResponse.json()
-      
-      if (!searchResponse.ok) {
-        throw new Error(searchData.error || 'Failed to search driver')
-      }
+      const searchData = await fetchJson(`/api/drivers/search?driver_id=${encodeURIComponent(searchId)}`)
       
       if (searchData.length === 0) {
         setError('No driver found with this ID')
@@ -119,23 +111,19 @@ function App() {
       setDriver(foundDriver)
       
       // Fetch driver incentives
-      const incentivesResponse = await fetch(`/api/drivers/${foundDriver.driver_id}/incentives`)
-      const incentivesData = await incentivesResponse.json()
+      const incentivesData = await fetchJson(`/api/drivers/${foundDriver.driver_id}/incentives`)
       setIncentives(incentivesData.incentives || [])
       
       // Fetch driver bans
-      const bansResponse = await fetch(`/api/drivers/${foundDriver.driver_id}/bans`)
-      const bansData = await bansResponse.json()
+      const bansData = await fetchJson(`/api/drivers/${foundDriver.driver_id}/bans`)
       setBans(bansData.bans || [])
       
       // Fetch active bans
-      const activeBansResponse = await fetch(`/api/drivers/${foundDriver.driver_id}/bans/active`)
-      const activeBansData = await activeBansResponse.json()
+      const activeBansData = await fetchJson(`/api/drivers/${foundDriver.driver_id}/bans/active`)
       setActiveBans(activeBansData.active_bans || [])
       
       // Fetch driver stats
-      const statsResponse = await fetch(`/api/drivers/${foundDriver.driver_id}/stats`)
-      const statsData = await statsResponse.json()
+      const statsData = await fetchJson(`/api/drivers/${foundDriver.driver_id}/stats`)
       setStats(statsData.stats || null)
       
     } catch (err) {

@@ -3,7 +3,7 @@ import sys
 # DON'T CHANGE THIS !!!
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 
-from flask import Flask, send_from_directory
+from flask import Flask, send_from_directory, request, jsonify
 from flask_cors import CORS
 from src.models.user import db
 from src.models.driver import Driver, IncentiveRecord, BanRecord
@@ -38,6 +38,26 @@ app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 db.init_app(app)
 with app.app_context():
     db.create_all()
+
+# JSON error handlers for API routes
+@app.errorhandler(404)
+def handle_404(e):
+    if request.path.startswith('/api'):
+        return jsonify({'error': 'Not found'}), 404
+    # fall through to SPA index via route below
+    return e
+
+@app.errorhandler(405)
+def handle_405(e):
+    if request.path.startswith('/api'):
+        return jsonify({'error': 'Method not allowed'}), 405
+    return e
+
+@app.errorhandler(500)
+def handle_500(e):
+    if request.path.startswith('/api'):
+        return jsonify({'error': 'Internal server error'}), 500
+    return e
 
 @app.route('/', defaults={'path': ''})
 @app.route('/<path:path>')

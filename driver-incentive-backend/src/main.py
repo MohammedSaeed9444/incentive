@@ -21,6 +21,11 @@ app.register_blueprint(user_bp, url_prefix='/api')
 app.register_blueprint(driver_bp, url_prefix='/api')
 app.register_blueprint(admin_bp, url_prefix='/api')
 
+# Health endpoint for quick checks
+@app.route('/api/health', methods=['GET'])
+def api_health():
+    return jsonify({'ok': True}), 200
+
 # Database configuration: prefer DATABASE_URL env (Railway provides it), fallback to local sqlite
 # Supports sqlite path and common postgres URLs
 DATABASE_URL = os.getenv('DATABASE_URL') or os.getenv('DB_URL')

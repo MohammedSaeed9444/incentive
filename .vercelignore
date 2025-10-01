@@ -1,0 +1,13 @@
+driver-incentive-backend/
+node_modules/
+**/node_modules/
+Dockerfile
+.dockerignore
+*.log
+**/.git/
+**/.gitignore
+**/.DS_Store
+**/.venv/
+**/venv/
+**/__pycache__/
+**/*.pyc

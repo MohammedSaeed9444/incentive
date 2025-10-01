@@ -1,6 +1,11 @@
 {
   "version": 2,
   "buildCommand": "cd driver-incentive-frontend && pnpm install --frozen-lockfile || npm ci || yarn install && pnpm run build || npm run build || yarn build",
+  "functions": {
+    "api/**.js": {
+      "runtime": "nodejs18.x"
+    }
+  },
   "rewrites": [
     { "source": "/api/proxy/:path*", "destination": "/api/proxy/:path*" },
     { "source": "/api/:path*", "destination": "/api/proxy/:path*" }

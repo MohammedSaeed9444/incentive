@@ -6,15 +6,11 @@
       "runtime": "nodejs18.x"
     }
   },
-  "rewrites": [
-    { "source": "/api/proxy/:path*", "destination": "/api/proxy/:path*" },
-    { "source": "/api/:path*", "destination": "/api/proxy/:path*" }
-  ],
   "routes": [
+    { "src": "/api/proxy/(.*)", "dest": "/api/proxy/$1" },
+    { "src": "/api/(.*)", "dest": "/api/proxy/$1" },
     { "src": "/assets/(.*)", "dest": "driver-incentive-frontend/dist/assets/$1" },
     { "src": "/favicon.ico", "dest": "driver-incentive-frontend/dist/favicon.ico" },
     { "src": "/(.*)", "dest": "driver-incentive-frontend/dist/index.html" }
-  ],
-  "cleanUrls": true,
-  "trailingSlash": false
+  ]
 }

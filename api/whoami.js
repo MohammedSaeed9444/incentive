@@ -1,10 +1,9 @@
-export const config = {
-  runtime: 'edge',
+module.exports = (req, res) => {
+  res.setHeader('Content-Type', 'application/json');
+  res.status(200).json({ 
+    ok: true, 
+    url: req.url,
+    method: req.method,
+    timestamp: new Date().toISOString()
+  });
 };
-
-export default async function handler(req) {
-  return new Response(
-    JSON.stringify({ ok: true, url: new URL(req.url).pathname }),
-    { status: 200, headers: { 'content-type': 'application/json' } }
-  );
-}

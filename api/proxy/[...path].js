@@ -4,7 +4,7 @@ export const config = {
 
 export default async function handler(req) {
   const url = new URL(req.url);
-  const backendBase = process.env.BACKEND_URL;
+  const backendBase = process.env.BACKEND_URL || 'https://incentive-production.up.railway.app';
   if (!backendBase) {
     return new Response('BACKEND_URL not configured', { status: 500 });
   }
